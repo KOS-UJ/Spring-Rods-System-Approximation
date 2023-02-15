@@ -37,3 +37,16 @@ class SpringRodsSystemSolver:
 
         constraint = optimize.Bounds(lower_bounds, upper_bounds)
         return constraint
+
+    def compute_stresses(self, displacements):
+        left_pos_diff = np.diff(self.model.left_domain)
+        right_pos_diff = np.diff(self.model.right_domain)
+
+        left_displ_diff = np.diff(displacements[:self.model.nodes_num])
+        right_displ_diff = np.diff(displacements[self.model.nodes_num:])
+
+        left_stresses = self.model.alphas[0] * left_displ_diff / left_pos_diff
+        right_stresses = self.model.alphas[1] * right_displ_diff / right_pos_diff
+
+        stresses = np.concatenate((left_stresses, right_stresses))
+        return stresses
