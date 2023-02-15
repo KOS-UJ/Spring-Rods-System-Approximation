@@ -1,7 +1,7 @@
 from typing import Tuple, Callable, Union
 import numpy as np
 
-class SprintRodsSystemSetup:
+class SpringRodsSystemSetup:
 
     def __init__(
             self,

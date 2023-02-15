@@ -1,11 +1,11 @@
 import numpy as np
 from scipy import optimize
 
-from spring_rods_system_setup import SprintRodsSystemSetup
+from spring_rods_system_setup import SpringRodsSystemSetup
 
 class SpringRodsSystemSolver:
 
-    def __init__(self, model: SprintRodsSystemSetup):
+    def __init__(self, model: SpringRodsSystemSetup):
         self.model = model
         self.penetration_constraint = self.create_penetration_constraint()
         self.dirichlet_boundaries = self.create_boundary_constraint()
