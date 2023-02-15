@@ -16,6 +16,8 @@ class SpringRodsSystemSolver:
             x0=np.zeros(2 * self.model.nodes_num),
             constraints=self.penetration_constraint,
             bounds=self.dirichlet_boundaries)
+        # No penetration constraint
+        assert np.all(np.diff(np.concatenate((self.model.left_domain, self.model.right_domain)) + result.x) > 0)
         return result
 
     def create_penetration_constraint(self):
