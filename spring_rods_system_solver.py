@@ -17,7 +17,7 @@ class SpringRodsSystemSolver:
             constraints=self.penetration_constraint,
             bounds=self.dirichlet_boundaries)
         # No penetration constraint
-        assert np.all(np.diff(np.concatenate((self.model.left_domain, self.model.right_domain)) + result.x) > 0)
+        assert np.all(np.diff(np.concatenate((self.model.domain[0], self.model.domain[1])) + result.x) > 0)
         return result
 
     def create_penetration_constraint(self):
@@ -41,14 +41,13 @@ class SpringRodsSystemSolver:
         return constraint
 
     def compute_stresses(self, displacements):
-        left_pos_diff = np.diff(self.model.left_domain)
-        right_pos_diff = np.diff(self.model.right_domain)
+        rods_displacement = (displacements[:self.model.nodes_num], displacements[self.model.nodes_num:])
 
-        left_displ_diff = np.diff(displacements[:self.model.nodes_num])
-        right_displ_diff = np.diff(displacements[self.model.nodes_num:])
+        side_stresses = [[], []]
+        for side in (0, 1):
+            position_diff = np.diff(self.model.domain[side])
+            displacement_diff = np.diff(rods_displacement[side])
+            side_stresses[side] = self.model.alphas[side] * displacement_diff / position_diff
 
-        left_stresses = self.model.alphas[0] * left_displ_diff / left_pos_diff
-        right_stresses = self.model.alphas[1] * right_displ_diff / right_pos_diff
-
-        stresses = np.concatenate((left_stresses, right_stresses))
+        stresses = np.concatenate((side_stresses[0], side_stresses[1]))
         return stresses

@@ -20,8 +20,8 @@ def plot_displacements_and_stress(
     cmap = sns.diverging_palette(255, 15, s=100, l=60, sep=1, center="dark", as_cmap=True)
 
     positions = np.concatenate((
-        model.left_domain,
-        model.right_domain
+        model.domain[0],
+        model.domain[1]
     ))
 
     fig = plt.gcf()
