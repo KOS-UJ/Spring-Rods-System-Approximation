@@ -27,6 +27,10 @@ class SpringRodsSystemSetup:
         self.body_forces_in_elements = self.compute_body_forces(body_forces)
 
     def __call__(self, displacement_field: np.ndarray):
+        """
+        :param displacement_field: array of displacements in both left and right rod
+        :return: value of the functional F(u) defined in (6.3)
+        """
         rods_displacements = (displacement_field[:self.nodes_num], displacement_field[self.nodes_num:])
         return self.A(rods_displacements) / 2 + self.j(rods_displacements) - self.f(rods_displacements)
 
@@ -42,7 +46,7 @@ class SpringRodsSystemSetup:
     def A(self, rods_displacements: Tuple[np.ndarray, np.ndarray]):
         """
         :param rods_displacements: pair of displacements in left and right rod
-        :return: dot product in L^2 space
+        :return: dot product <Au, u> defined in (4.11)
         """
         return np.sum([
             self.alphas[side] * np.diff(rods_displacements[side]) ** 2 / np.diff(self.domain[side])
@@ -50,12 +54,20 @@ class SpringRodsSystemSetup:
         ])
 
     def j(self, rods_displacements: Tuple[np.ndarray, np.ndarray]):
+        """
+        :param rods_displacements: pair of displacements in left and right rod
+        :return: the function hat{j}(u) defined in (6.1)
+        """
         left_end = rods_displacements[0][-1]
         right_end = rods_displacements[1][0]
         const = self.spring_const[0 if right_end - left_end < 0 else 1]
         return const * (right_end - left_end) ** 2 / 2
 
     def f(self, rods_displacements: Tuple[np.ndarray, np.ndarray]):
+        """
+        :param rods_displacements: pair of displacements in left and right rod
+        :return: dot product <f, u> defined in (4.13)
+        """
         approx = np.array([
             np.diff(self.domain[side]) * (rods_displacements[side][1:] + rods_displacements[side][:-1]) / 2
             for side in (0, 1)
@@ -63,6 +75,10 @@ class SpringRodsSystemSetup:
         return np.sum(self.body_forces_in_elements * approx)
 
     def compute_body_forces(self, force_function: Callable[[np.ndarray], Union[np.ndarray, float]]):
+        """
+        :param force_function: function that takes positions and returns corresponding body forces
+        :return: values of body forces in the centers of finite elements
+        """
         centers = np.array([
             (self.domain[side][1:] + self.domain[side][:-1]) / 2
             for side in (0, 1)
