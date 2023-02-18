@@ -28,11 +28,15 @@ class SpringRodsSystemSetup:
 
     def __call__(self, displacement_field: np.ndarray):
         """
+        Compute F(u) = (1/2) <Au, u> + j(u) - <f, u>
+
         :param displacement_field: array of displacements in both left and right rod
         :return: value of the functional F(u) defined in (6.3)
         """
         rods_displacements = (displacement_field[:self.nodes_num], displacement_field[self.nodes_num:])
-        return self.A(rods_displacements) / 2 + self.j(rods_displacements) - self.f(rods_displacements)
+        return self.stress_displacement_prod(rods_displacements) / 2 \
+            + self.effect_of_spring(rods_displacements) \
+            - self.effect_of_body_forces(rods_displacements)
 
     def set_material_const(self, material_const: Tuple[float, float]):
         self.alphas = material_const
@@ -43,30 +47,30 @@ class SpringRodsSystemSetup:
     def set_body_forces(self, body_forces: Callable[[np.ndarray], Union[np.ndarray, float]]):
         self.body_forces_in_elements = self.compute_body_forces(body_forces)
 
-    def A(self, rods_displacements: Tuple[np.ndarray, np.ndarray]):
+    def stress_displacement_prod(self, rods_displacements: Tuple[np.ndarray, np.ndarray]):
         """
         :param rods_displacements: pair of displacements in left and right rod
-        :return: dot product <Au, u> defined in (4.11)
+        :return: value of the dot product <Au, u> defined in (4.11)
         """
         return np.sum([
             self.alphas[side] * np.diff(rods_displacements[side]) ** 2 / np.diff(self.domain[side])
             for side in (0, 1)
         ])
 
-    def j(self, rods_displacements: Tuple[np.ndarray, np.ndarray]):
+    def effect_of_spring(self, rods_displacements: Tuple[np.ndarray, np.ndarray]):
         """
         :param rods_displacements: pair of displacements in left and right rod
-        :return: the function hat{j}(u) defined in (6.1)
+        :return: value of the function hat{j}(u) defined in (6.1)
         """
         left_end = rods_displacements[0][-1]
         right_end = rods_displacements[1][0]
         const = self.spring_const[0 if right_end - left_end < 0 else 1]
         return const * (right_end - left_end) ** 2 / 2
 
-    def f(self, rods_displacements: Tuple[np.ndarray, np.ndarray]):
+    def effect_of_body_forces(self, rods_displacements: Tuple[np.ndarray, np.ndarray]):
         """
         :param rods_displacements: pair of displacements in left and right rod
-        :return: dot product <f, u> defined in (4.13)
+        :return: value of the dot product <f, u> defined in (4.13)
         """
         approx = np.array([
             np.diff(self.domain[side]) * (rods_displacements[side][1:] + rods_displacements[side][:-1]) / 2
@@ -77,7 +81,7 @@ class SpringRodsSystemSetup:
     def compute_body_forces(self, force_function: Callable[[np.ndarray], Union[np.ndarray, float]]):
         """
         :param force_function: function that takes positions and returns corresponding body forces
-        :return: values of body forces in the centers of finite elements
+        :return: value of the body forces in the centers of finite elements
         """
         centers = np.array([
             (self.domain[side][1:] + self.domain[side][:-1]) / 2
