@@ -77,11 +77,11 @@ class SpringRodsSystemSetup:
         :param rods_displacements: pair of displacements in left and right rod
         :return: value of the dot product <f, u> defined in (4.13)
         """
-        approx = np.array([
+        average_displacement = np.array([
             np.diff(self.domain[side]) * (rods_displacements[side][1:] + rods_displacements[side][:-1]) / 2
             for side in (0, 1)
         ])
-        return np.sum(self.body_forces_in_elements * approx)
+        return np.sum(self.body_forces_in_elements * average_displacement)
 
     def compute_body_forces(self, force_function: Callable[[np.ndarray], Union[np.ndarray, float]]):
         """
