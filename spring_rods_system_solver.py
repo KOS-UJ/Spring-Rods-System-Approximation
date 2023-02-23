@@ -3,41 +3,35 @@ from scipy import optimize
 
 from spring_rods_system_setup import SpringRodsSystemSetup
 
+
 class SpringRodsSystemSolver:
 
     def __init__(self, model: SpringRodsSystemSetup):
         self.model = model
         self.penetration_constraint = self.create_penetration_constraint()
-        self.dirichlet_boundaries = self.create_boundary_constraint()
 
-    def __call__(self, *args, **kwargs):
+    def __call__(self, *args, **kwargs) -> np.ndarray:
         result = optimize.minimize(
             fun=self.model,
-            x0=np.zeros(2 * self.model.nodes_num),
+            x0=np.zeros(2 * self.model.nodes_num - 2),
             constraints=self.penetration_constraint,
-            bounds=self.dirichlet_boundaries)
-        # No penetration constraint
-        assert np.all(np.diff(np.concatenate((self.model.domain[0], self.model.domain[1])) + result.x) > 0)
-        return result
+            options={'maxiter': 1000}
+        )
+        assert result.success
+        # add the boundary nodes (under homogenous dirichlet constraint)
+        displacement = np.pad(result.x, (1, 1))
+        # check non-penetrating body constraint
+        assert np.all(np.diff(np.concatenate((self.model.domain[0], self.model.domain[1])) + displacement) > 0)
+        # TODO this change of output type have to be included in experiments
+        return displacement
 
     def create_penetration_constraint(self):
-        constraint = np.zeros(2 * self.model.nodes_num)
-        constraint[self.model.nodes_num - 1] = 1
-        constraint[self.model.nodes_num] = -1
+        free_nodes_num = self.model.nodes_num - 1
+        constraint = np.zeros(2 * free_nodes_num)
+        constraint[free_nodes_num - 1] = 1
+        constraint[free_nodes_num] = -1
 
         constraint = optimize.LinearConstraint(A=constraint, lb=-np.inf, ub=self.model.spring_len)
-        return constraint
-
-    def create_boundary_constraint(self):
-        lower_bounds = np.full(2 * self.model.nodes_num, fill_value=-np.inf)
-        lower_bounds[0] = 0
-        lower_bounds[-1] = 0
-
-        upper_bounds = np.full(2 * self.model.nodes_num, fill_value=np.inf)
-        upper_bounds[0] = 0
-        upper_bounds[-1] = 0
-
-        constraint = optimize.Bounds(lower_bounds, upper_bounds)
         return constraint
 
     def compute_stresses(self, displacements):
