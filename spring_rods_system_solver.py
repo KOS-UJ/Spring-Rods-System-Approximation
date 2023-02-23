@@ -15,7 +15,9 @@ class SpringRodsSystemSolver:
             fun=self.model,
             x0=np.zeros(2 * self.model.nodes_num - 2),
             constraints=self.penetration_constraint,
+            options={'maxiter': 1000}
         )
+        assert result.success
         # add the boundary nodes (under homogenous dirichlet constraint)
         displacement = np.pad(result.x, (1, 1))
         # check non-penetrating body constraint
