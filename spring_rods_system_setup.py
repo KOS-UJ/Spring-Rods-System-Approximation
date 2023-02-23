@@ -1,7 +1,12 @@
 from typing import Tuple, Callable, Union
 import numpy as np
 
+
 class SpringRodsSystemSetup:
+    """
+    Provides the functional which minimum is the solution for the spring rods system
+    and encapsulates the mechanics of this system
+    """
 
     def __init__(
             self,
