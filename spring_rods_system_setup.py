@@ -31,8 +31,12 @@ class SpringRodsSystemSetup:
         Compute F(u) = (1/2) <Au, u> + j(u) - <f, u>
 
         :param displacement_field: array of displacements in both left and right rod
+        WITH NO VALUES OF NODES UNDER DIRICHLET CONDITION
         :return: value of the functional F(u) defined in (6.3)
         """
+        # add the boundary nodes with zero dirichlet condition
+        displacement_field = np.pad(displacement_field, (1, 1))
+        # divide displacement field to corresponding left and right rods
         rods_displacements = (displacement_field[:self.nodes_num], displacement_field[self.nodes_num:])
         return self.stress_displacement_prod(rods_displacements) / 2 \
             + self.effect_of_spring(rods_displacements) \
