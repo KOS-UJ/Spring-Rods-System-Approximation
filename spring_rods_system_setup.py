@@ -12,7 +12,7 @@ class SpringRodsSystemSetup:
             self,
             interval: Tuple[float, float],
             spring_len: float,
-            step_delta: float,
+            step_size: float,
             material_const: Tuple[float, float],
             spring_const: Tuple[float, float],
             body_forces: Callable[[np.ndarray], Union[np.ndarray, float]]
@@ -21,8 +21,8 @@ class SpringRodsSystemSetup:
         self.half_spring_len = spring_len / 2
 
         left_end, right_end = interval
-        left_rod = np.arange(left_end, -self.half_spring_len + step_delta, step_delta)
-        right_rod = np.arange(self.half_spring_len, right_end + step_delta, step_delta)
+        left_rod = np.arange(left_end, -self.half_spring_len + step_size, step_size)
+        right_rod = np.arange(self.half_spring_len, right_end + step_size, step_size)
         self.domain = (left_rod, right_rod)
 
         self.alphas = material_const
