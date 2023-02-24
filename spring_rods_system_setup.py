@@ -81,7 +81,7 @@ class SpringRodsSystemSetup:
         :param rods_displacements: pair of displacements in left and right rod
         :return: value of the dot product <f, u> defined in (4.13)
         """
-        average_displacement = np.array([
+        average_displacement = np.concatenate([
             np.diff(self.domain[side]) * (rods_displacements[side][1:] + rods_displacements[side][:-1]) / 2
             for side in (0, 1)
         ])
@@ -92,8 +92,7 @@ class SpringRodsSystemSetup:
         :param force_function: function that takes positions and returns corresponding body forces
         :return: value of the body forces in the centers of finite elements
         """
-        centers = np.array([
-            (self.domain[side][1:] + self.domain[side][:-1]) / 2
-            for side in (0, 1)
+        centers = np.concatenate([
+            (self.domain[side][1:] + self.domain[side][:-1]) / 2 for side in (0, 1)
         ])
         return force_function(centers)
