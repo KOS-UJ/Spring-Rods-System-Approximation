@@ -51,7 +51,7 @@ def plot_displacements_and_stress(
     plt.axvline(x=0.5, color='gray', linestyle=':')
 
     plt.ylabel(parameter_name)
-    plt.xlabel('x position')
+    plt.xlabel('Position')
 
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=normalize)
     fig.colorbar(sm)
