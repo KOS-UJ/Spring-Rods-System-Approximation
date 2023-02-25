@@ -1,18 +1,11 @@
+from typing import Tuple
 import numpy as np
 
-def l2_norm(
-        values: np.ndarray,
-        nodes: np.ndarray
-):
-    half = nodes.size // 2
 
-    left_val_diff = np.diff(values[:half])
-    left_pos_diff = np.diff(nodes[:half])
+def l2_norm(values: Tuple[np.ndarray, np.ndarray], domain: Tuple[np.ndarray, np.ndarray]) -> float:
 
-    right_val_diff = np.diff(values[half:])
-    right_pos_diff = np.diff(values[half:])
-
-    left_norm = np.sum(left_val_diff**2 * left_pos_diff**2)
-    right_norm = np.sum(right_val_diff**2 * right_pos_diff**2)
-
-    return np.sqrt((left_norm + right_norm) / 3)
+    base = np.sum((
+        np.sum(np.diff(val) ** 2 * np.diff(dom) ** 2)
+        for val, dom in zip(values, domain)
+    ))
+    return np.sqrt(base / 3)
