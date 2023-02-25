@@ -8,12 +8,15 @@ class SpringRodsSystemSolver:
 
     def __init__(self, model: SpringRodsSystemSetup):
         self.model = model
+        self.free_nodes_num = self.model.domain[0].size + self.model.domain[1].size - 2
+        self.right_rod_beg = self.model.domain[0].size - 1
+
         self.penetration_constraint = self.create_penetration_constraint()
 
     def __call__(self, *args, **kwargs) -> np.ndarray:
         result = optimize.minimize(
             fun=self.model,
-            x0=np.zeros(2 * self.model.nodes_num - 2),
+            x0=np.zeros(self.free_nodes_num),
             constraints=self.penetration_constraint,
             options={'maxiter': 1000}
         )
@@ -26,16 +29,16 @@ class SpringRodsSystemSolver:
         return displacement
 
     def create_penetration_constraint(self):
-        free_nodes_num = self.model.nodes_num - 1
-        constraint = np.zeros(2 * free_nodes_num)
-        constraint[free_nodes_num - 1] = 1
-        constraint[free_nodes_num] = -1
+        constraint = np.zeros(self.free_nodes_num)
+        constraint[self.right_rod_beg - 1] = 1
+        constraint[self.right_rod_beg] = -1
 
         constraint = optimize.LinearConstraint(A=constraint, lb=-np.inf, ub=self.model.spring_len)
         return constraint
 
     def compute_stresses(self, displacements):
-        rods_displacement = (displacements[:self.model.nodes_num], displacements[self.model.nodes_num:])
+        right_rod_beg = self.model.domain[0].size
+        rods_displacement = (displacements[:right_rod_beg], displacements[right_rod_beg:])
 
         side_stresses = [[], []]
         for side in (0, 1):

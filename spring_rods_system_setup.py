@@ -12,19 +12,23 @@ class SpringRodsSystemSetup:
             self,
             interval: Tuple[float, float],
             spring_len: float,
-            nodes_num: int,
+            step_size: float,
             material_const: Tuple[float, float],
             spring_const: Tuple[float, float],
             body_forces: Callable[[np.ndarray], Union[np.ndarray, float]]
     ):
         self.spring_len = spring_len
-        self.half_spring_len = spring_len / 2
-        self.nodes_num = nodes_num
+        half_spring_len = spring_len / 2
 
         left_end, right_end = interval
-        left_rod = np.linspace(left_end, -self.half_spring_len, nodes_num)
-        right_rod = np.linspace(self.half_spring_len, right_end, nodes_num)
+        left_rod = np.arange(left_end, -half_spring_len + step_size / 2, step_size)
+        right_rod = np.arange(half_spring_len, right_end + step_size / 2, step_size)
         self.domain = (left_rod, right_rod)
+
+        assert np.isclose(left_rod[0], left_end)
+        assert np.isclose(left_rod[-1], -half_spring_len)
+        assert np.isclose(right_rod[0], half_spring_len)
+        assert np.isclose(right_rod[-1], right_end)
 
         self.alphas = material_const
         self.spring_const = spring_const
@@ -42,7 +46,8 @@ class SpringRodsSystemSetup:
         # add the boundary nodes with zero dirichlet condition
         displacement_field = np.pad(displacement_field, (1, 1))
         # divide displacement field to corresponding left and right rods
-        rods_displacements = (displacement_field[:self.nodes_num], displacement_field[self.nodes_num:])
+        right_rod_beg = self.domain[0].size
+        rods_displacements = (displacement_field[:right_rod_beg], displacement_field[right_rod_beg:])
         return self.stress_displacement_prod(rods_displacements) / 2 \
             + self.effect_of_spring(rods_displacements) \
             - self.effect_of_body_forces(rods_displacements)
@@ -61,10 +66,10 @@ class SpringRodsSystemSetup:
         :param rods_displacements: pair of displacements in left and right rod
         :return: value of the dot product <Au, u> defined in (4.11)
         """
-        return np.sum([
+        return np.sum(np.concatenate([
             self.alphas[side] * np.diff(rods_displacements[side]) ** 2 / np.diff(self.domain[side])
             for side in (0, 1)
-        ])
+        ]))
 
     def effect_of_spring(self, rods_displacements: Tuple[np.ndarray, np.ndarray]):
         """
