@@ -46,8 +46,9 @@ class SpringRodsSystemSetup:
         # add the boundary nodes with zero dirichlet condition
         displacement_field = np.pad(displacement_field, (1, 1))
         # divide displacement field to corresponding left and right rods
-        right_rod_beg = self.domain[0].size
-        rods_displacements = (displacement_field[:right_rod_beg], displacement_field[right_rod_beg:])
+        rods_div_idx = self.domain[0].size
+        rods_displacements = (displacement_field[:rods_div_idx], displacement_field[rods_div_idx:])
+
         return self.stress_displacement_prod(rods_displacements) / 2 \
             + self.effect_of_spring(rods_displacements) \
             - self.effect_of_body_forces(rods_displacements)

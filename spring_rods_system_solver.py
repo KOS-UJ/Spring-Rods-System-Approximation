@@ -35,7 +35,9 @@ class SpringRodsSystemSolver:
         displacement = np.pad(result.x, (1, 1))
         # check non-penetrating body constraint
         assert np.all(np.diff(np.concatenate((self.model.domain[0], self.model.domain[1])) + displacement) > 0)
-        return displacement[:self.model.domain[0].size], displacement[self.model.domain[0].size:]
+
+        rods_div_idx = self.model.domain[0].size
+        return displacement[:rods_div_idx], displacement[rods_div_idx:]
 
     def create_penetration_constraint(self) -> optimize.LinearConstraint:
         constraint = np.zeros(self.free_nodes_num)
