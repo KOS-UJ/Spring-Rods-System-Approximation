@@ -18,12 +18,17 @@ class SpringRodsSystemSetup:
             body_forces: Callable[[np.ndarray], Union[np.ndarray, float]]
     ):
         self.spring_len = spring_len
-        self.half_spring_len = spring_len / 2
+        half_spring_len = spring_len / 2
 
         left_end, right_end = interval
-        left_rod = np.arange(left_end, -self.half_spring_len + step_size, step_size)
-        right_rod = np.arange(self.half_spring_len, right_end + step_size, step_size)
+        left_rod = np.arange(left_end, -half_spring_len + step_size / 2, step_size)
+        right_rod = np.arange(half_spring_len, right_end + step_size / 2, step_size)
         self.domain = (left_rod, right_rod)
+
+        assert np.isclose(left_rod[0], left_end)
+        assert np.isclose(left_rod[-1], -half_spring_len)
+        assert np.isclose(right_rod[0], half_spring_len)
+        assert np.isclose(right_rod[-1], right_end)
 
         self.alphas = material_const
         self.spring_const = spring_const
@@ -61,10 +66,10 @@ class SpringRodsSystemSetup:
         :param rods_displacements: pair of displacements in left and right rod
         :return: value of the dot product <Au, u> defined in (4.11)
         """
-        return np.sum([
+        return np.sum(np.concatenate([
             self.alphas[side] * np.diff(rods_displacements[side]) ** 2 / np.diff(self.domain[side])
             for side in (0, 1)
-        ])
+        ]))
 
     def effect_of_spring(self, rods_displacements: Tuple[np.ndarray, np.ndarray]):
         """
