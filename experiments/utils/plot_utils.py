@@ -29,8 +29,6 @@ def plot_displacements_and_stress(
 
     plt.yticks(
         list(range(-1, -len(parameters_space) - 1, -1)),
-        # list(range(len(spring_consts_discret)))
-        # [const[0] for const in spring_consts_discret]
         parameters_space
     )
     plt.ylim((-len(parameters_space) - 1, 0))
@@ -38,11 +36,12 @@ def plot_displacements_and_stress(
     for idx, (displacements, stresses) in enumerate(results, 1):
 
         new_positions = positions + displacements
+        right_rod_beg = model.domain[0].size
 
-        for p_idx, _ in enumerate(new_positions[:model.nodes_num - 1]):
+        for p_idx, _ in enumerate(new_positions[:right_rod_beg - 1]):
             plt.plot([new_positions[p_idx], new_positions[p_idx + 1]], [-idx, -idx],
                      color=cmap(normalize(stresses[p_idx])), linewidth=4)
-        for p_idx, _ in enumerate(new_positions[model.nodes_num:-1], model.nodes_num):
+        for p_idx, _ in enumerate(new_positions[right_rod_beg:-1], right_rod_beg):
             plt.plot([new_positions[p_idx], new_positions[p_idx + 1]], [-idx, -idx],
                      color=cmap(normalize(stresses[p_idx - 1])), linewidth=4)
 
