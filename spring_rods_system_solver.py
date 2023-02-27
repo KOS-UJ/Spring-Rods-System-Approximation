@@ -12,23 +12,24 @@ class SpringRodsSystemSolver:
     Encapsulates the computation of equilibrium state of the system.
     """
     
-    def __init__(self, model: SpringRodsSystemSetup):
+    def __init__(self, model: SpringRodsSystemSetup, spring_len_bounds: tuple = None):
         self.model = model
         self.free_nodes_num = self.model.domain[0].size + self.model.domain[1].size - 2
         self.right_rod_beg = self.model.domain[0].size - 1
 
-        self.penetration_constraint = self.create_penetration_constraint()
+        bounds = spring_len_bounds or (-np.inf, model.spring_len)
+        self.penetration_constraint = self.create_spring_len_constraint(bounds)
 
     def __call__(self, *args, **kwargs) -> Tuple[np.ndarray, np.ndarray]:
         """
         :return: pair of displacement vectors corresponding to left and right rod in the equilibrium.
         """
-
         result = optimize.minimize(
             fun=self.model,
             x0=np.zeros(self.free_nodes_num),
             constraints=self.penetration_constraint,
-            options={'maxiter': 1000}
+            tol=1e-13,
+            options={'maxiter': 10000}
         )
         assert result.success
         # add the boundary nodes (under homogenous dirichlet constraint)
@@ -39,12 +40,12 @@ class SpringRodsSystemSolver:
         rods_div_idx = self.model.domain[0].size
         return displacement[:rods_div_idx], displacement[rods_div_idx:]
 
-    def create_penetration_constraint(self) -> optimize.LinearConstraint:
+    def create_spring_len_constraint(self, bounds: tuple) -> optimize.LinearConstraint:
         constraint = np.zeros(self.free_nodes_num)
         constraint[self.right_rod_beg - 1] = 1
         constraint[self.right_rod_beg] = -1
 
-        constraint = optimize.LinearConstraint(A=constraint, lb=-np.inf, ub=self.model.spring_len)
+        constraint = optimize.LinearConstraint(A=constraint, lb=bounds[0], ub=bounds[1])
         return constraint
 
     def compute_stresses(self, displacements: Tuple[np.ndarray, np.ndarray]) -> Tuple[np.ndarray, np.ndarray]:
