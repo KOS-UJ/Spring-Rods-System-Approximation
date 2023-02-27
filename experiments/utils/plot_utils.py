@@ -41,8 +41,13 @@ def plot_displacements_and_stress(
                 )
 
     plt.axvline(x=0, color='gray', linestyle='--')
-    plt.axvline(x=-0.5, color='gray', linestyle=':')
-    plt.axvline(x=0.5, color='gray', linestyle=':')
+    plt.axvline(x=-model.spring_len / 2, color='gray', linestyle=':')
+    plt.axvline(x=model.spring_len / 2, color='gray', linestyle=':')
+
+    plt.text(model.domain[0][0], 0.2, 'a')
+    plt.text(-model.spring_len / 2, 0.2, '-l')
+    plt.text(model.spring_len / 2, 0.2, 'l')
+    plt.text(model.domain[1][-1], 0.2, 'b')
 
     plt.ylabel(parameter_name)
     plt.xlabel('Position')
