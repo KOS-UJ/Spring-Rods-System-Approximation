@@ -19,9 +19,6 @@ def plot_displacements_and_stress(
     normalize = colors.Normalize(vmin=limits[0], vmax=limits[1])
     cmap = sns.diverging_palette(255, 15, s=100, l=60, sep=1, center="dark", as_cmap=True)
 
-    fig = plt.gcf()
-    fig.set_size_inches((6, 3))
-
     plt.yticks(
         list(range(-1, -len(parameters_space) - 1, -1)),
         parameters_space
@@ -44,15 +41,15 @@ def plot_displacements_and_stress(
     plt.axvline(x=-model.spring_len / 2, color='gray', linestyle=':')
     plt.axvline(x=model.spring_len / 2, color='gray', linestyle=':')
 
-    plt.text(model.domain[0][0], 0.2, 'a')
-    plt.text(-model.spring_len / 2, 0.2, '-l')
-    plt.text(model.spring_len / 2, 0.2, 'l')
-    plt.text(model.domain[1][-1], 0.2, 'b')
+    plt.figtext(0.15, 0.01, 'a', horizontalalignment='center', verticalalignment='top')
+    plt.figtext(0.285, 0.01, '-l', horizontalalignment='center', verticalalignment='top')
+    plt.figtext(0.58, 0.01, 'l', horizontalalignment='center', verticalalignment='top')
+    plt.figtext(0.72, 0.01, 'b', horizontalalignment='center', verticalalignment='top')
 
     plt.ylabel(parameter_name)
     plt.xlabel('Position')
 
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=normalize)
-    fig.colorbar(sm)
+    plt.gcf().colorbar(sm, aspect=50)
 
     plt.savefig(path, bbox_inches='tight')
