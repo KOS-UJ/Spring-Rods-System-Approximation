@@ -29,7 +29,8 @@ class TestSpringRodsSystemSetup:
         assert result == pytest.approx(spring_reaction)
 
     @pytest.mark.parametrize('displacement_func, body_func', [
-        (lambda x: np.where(x < 0, (x + 10), (x-10)), lambda x: np.full_like(x, 1)),
+        (lambda x: np.where(x < 0, (x + 10), (x - 10)), lambda x: np.full_like(x, 1)),
+        (lambda x: np.where(x < 0, (x + 10), (x-10)), lambda x: np.where(x < 0, 1, 2)),
         (lambda x: np.where(x < 0, (x + 10)**2, (x-10)**2), lambda x: np.where(x < 0, -1, 1))
     ])
     def test_effect_of_body_forces(self, displacement_func, body_func):
