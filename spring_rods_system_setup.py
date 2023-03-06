@@ -32,8 +32,7 @@ class SpringRodsSystemSetup:
 
         self.alphas = material_const
         self.spring_const = spring_const
-
-        self.body_forces_in_elements = self.compute_body_forces(body_forces)
+        self.body_forces_in_nodes = (body_forces(left_rod), body_forces(right_rod))
 
     def __call__(self, displacement_field: np.ndarray):
         """
@@ -60,7 +59,7 @@ class SpringRodsSystemSetup:
         self.spring_const = spring_const
 
     def set_body_forces(self, body_forces: Callable[[np.ndarray], Union[np.ndarray, float]]):
-        self.body_forces_in_elements = self.compute_body_forces(body_forces)
+        self.body_forces_in_nodes = (body_forces(self.domain[0]), body_forces(self.domain[1]))
 
     def stress_displacement_prod(self, rods_displacements: Tuple[np.ndarray, np.ndarray]):
         """
@@ -87,18 +86,8 @@ class SpringRodsSystemSetup:
         :param rods_displacements: pair of displacements in left and right rod.
         :return: value of the dot product <f, u> defined in (4.13).
         """
-        average_displacement = np.concatenate([
-            np.diff(self.domain[side]) * (rods_displacements[side][1:] + rods_displacements[side][:-1]) / 2
+        rod_integral = [
+            np.trapz(y=rods_displacements[side] * self.body_forces_in_nodes[side], x=self.domain[side])
             for side in (0, 1)
-        ])
-        return np.sum(self.body_forces_in_elements * average_displacement)
-
-    def compute_body_forces(self, force_function: Callable[[np.ndarray], Union[np.ndarray, float]]):
-        """
-        :param force_function: function that takes positions and returns corresponding body forces.
-        :return: value of the body forces in the centers of finite elements.
-        """
-        centers = np.concatenate([
-            (self.domain[side][1:] + self.domain[side][:-1]) / 2 for side in (0, 1)
-        ])
-        return force_function(centers)
+        ]
+        return np.sum(rod_integral)
