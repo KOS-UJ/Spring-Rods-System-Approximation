@@ -11,11 +11,27 @@ class TestSpringRodsSystemSetup:
         self.system = SpringRodsSystemSetup(
             interval=(-10, 10),
             spring_len=3,
-            step_size=0.1,
+            step_size=0.001,
             material_const=(1, 1),
             spring_const=(1, 0.75),
             body_forces=lambda x: np.where(x < 0, 1, -1)
         )
+
+    @pytest.mark.parametrize('function, derivative, spring_behaviour', [
+        (lambda x: np.where(x < 0, (x + 10), (x - 10)), lambda x: np.full_like(x, 1), 'compression'),
+        (lambda x: (x/10)**2 - 1, lambda x: x/50, 'compression')
+    ])
+    def test_stress_displacement_prod(self, function, derivative, spring_behaviour):
+        domain = self.system.domain
+        fun_values = (function(domain[0]), function(domain[1]))
+
+        result = self.system.stress_displacement_prod(fun_values)
+
+        spring_coef = self.system.spring_const[0 if spring_behaviour == 'compression' else 1]
+        left_rod_int = quad(lambda x: spring_coef * derivative(x)**2, domain[0][0], domain[0][-1])[0]
+        right_rod_int = quad(lambda x: spring_coef * derivative(x)**2, domain[1][0], domain[1][-1])[0]
+        expected = left_rod_int + right_rod_int
+        assert result == pytest.approx(expected)
 
     @pytest.mark.parametrize('displacements, spring_reaction', [
         ((np.array([1]), np.array([1])), 0),
@@ -31,6 +47,7 @@ class TestSpringRodsSystemSetup:
     @pytest.mark.parametrize('displacement_func, body_func', [
         (lambda x: np.where(x < 0, (x + 10), (x - 10)), lambda x: np.full_like(x, 1)),
         (lambda x: np.where(x < 0, (x + 10), (x-10)), lambda x: np.where(x < 0, 1, 2)),
+        (lambda x: np.where(x < 0, (x + 10)**2, (x-10)**2), lambda x: np.full_like(x, 1)),
         (lambda x: np.where(x < 0, (x + 10)**2, (x-10)**2), lambda x: np.where(x < 0, -1, 1))
     ])
     def test_effect_of_body_forces(self, displacement_func, body_func):
