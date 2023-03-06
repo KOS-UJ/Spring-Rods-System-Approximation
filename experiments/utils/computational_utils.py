@@ -16,10 +16,12 @@ def approximate_in_positions(
         target_nodes: np.ndarray
 ):
     assert reference_nodes.size == values.size
+    assert reference_nodes[0] == target_nodes[0]
+    assert reference_nodes[-1] == target_nodes[-1]
     result = np.empty_like(target_nodes)
-    result[0] = result[-1] = 0
+    result[0] = values[0]
     ref_idx = 0
-    for idx, curr_node in enumerate(target_nodes[1:-1], 1):
+    for idx, curr_node in enumerate(target_nodes[1:], 1):
         while reference_nodes[ref_idx] <= curr_node and ref_idx < reference_nodes.size - 1:
             ref_idx += 1
         assert reference_nodes[ref_idx - 1] <= curr_node <= reference_nodes[ref_idx]
