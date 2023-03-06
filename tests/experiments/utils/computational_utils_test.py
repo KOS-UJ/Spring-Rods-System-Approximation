@@ -18,3 +18,25 @@ def test_l2_norm(function: Callable, interval: Tuple[Tuple[float, float], Tuple[
     result = l2_norm(values, domain)
 
     assert result == pytest.approx(expected)
+
+
+@pytest.mark.parametrize('function, interval, ref_step_size, tar_step_size', [
+    (lambda x: np.full_like(x, 1), (-1, 1), 0.0003, 0.1),
+    (np.sin, (-np.pi, np.pi), 0.001, 0.1),
+    (lambda x: x**3, (0, 100), 0.0001, 0.1),
+    (lambda x: x, (0, 100), 1, 0.01)
+])
+def test_approximate_in_positions(function, interval, ref_step_size, tar_step_size):
+
+    interval_size = interval[1] - interval[0]
+    ref_domain = np.linspace(*interval, int(interval_size / ref_step_size))
+    tar_domain = np.linspace(*interval, int(interval_size / tar_step_size))
+
+    ref_values = function(ref_domain)
+
+    result = approximate_in_positions(ref_values, ref_domain, tar_domain)
+
+    expected = function(tar_domain)
+    print(result - expected)
+
+    assert result == pytest.approx(expected)
