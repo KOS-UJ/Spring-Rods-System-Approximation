@@ -21,7 +21,7 @@ class TestSpringRodsSystemSetup:
         ((np.array([1]), np.array([1])), 0),
         ((np.array([1]), np.array([-1])), 2),
         ((np.array([-1]), np.array([1])), 1.5),
-        ((np.array([-2]), np.array([2])), 8),
+        ((np.array([-2]), np.array([2])), 6),
     ])
     def test_effect_of_spring(self, displacements, spring_reaction):
         result = self.system.effect_of_spring(displacements)
