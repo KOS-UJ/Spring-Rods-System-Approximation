@@ -17,7 +17,8 @@ def plot_displacements_and_stress(
         path: str
 ):
     normalize = colors.Normalize(vmin=limits[0], vmax=limits[1])
-    cmap = sns.diverging_palette(255, 15, s=100, l=60, sep=1, center="dark", as_cmap=True)
+    cmap = sns.dark_palette((.7, .7, .7), n_colors=15, as_cmap=True)
+    # width = 20
 
     plt.yticks(
         list(range(-1, -len(parameters_space) - 1, -1)),
@@ -29,13 +30,15 @@ def plot_displacements_and_stress(
 
         for side in (0, 1):
             new_positions = model.domain[side] + displacements[side]
-            for p_idx, _ in enumerate(new_positions[:-1]):
-                plt.plot(
-                    [new_positions[p_idx], new_positions[p_idx + 1]],
-                    [-idx, -idx],
-                    color=cmap(normalize(stresses[side][p_idx])),
-                    linewidth=4
-                )
+            mids = (new_positions[1:] + new_positions[:-1]) / 2
+            plt.scatter(
+                x=mids,
+                y=np.full_like(mids, fill_value=-idx),
+                # s=width * normalize(stresses[side]),
+                c=cmap(normalize(stresses[side])),
+                # marker='s'
+                marker="|"
+            )
 
     plt.axvline(x=0, color='gray', linestyle='--')
     plt.axvline(x=-model.spring_len / 2, color='gray', linestyle=':')
