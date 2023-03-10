@@ -41,10 +41,10 @@ def plot_displacements_and_stress(
     plt.axvline(x=-model.spring_len / 2, color='gray', linestyle=':')
     plt.axvline(x=model.spring_len / 2, color='gray', linestyle=':')
 
-    plt.figtext(0.15, 0.01, 'a', horizontalalignment='center', verticalalignment='top')
-    plt.figtext(0.285, 0.01, '-l', horizontalalignment='center', verticalalignment='top')
-    plt.figtext(0.58, 0.01, 'l', horizontalalignment='center', verticalalignment='top')
-    plt.figtext(0.72, 0.01, 'b', horizontalalignment='center', verticalalignment='top')
+    plt.figtext(0.15, 0.03, 'a', horizontalalignment='center', verticalalignment='top')
+    plt.figtext(0.285, 0.03, '-l', horizontalalignment='center', verticalalignment='top')
+    plt.figtext(0.58, 0.03, 'l', horizontalalignment='center', verticalalignment='top')
+    plt.figtext(0.72, 0.03, 'b', horizontalalignment='center', verticalalignment='top')
 
     plt.ylabel(parameter_name)
     plt.xlabel('Position')
