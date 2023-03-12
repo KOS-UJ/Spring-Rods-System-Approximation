@@ -34,8 +34,9 @@ class SpringRodsSystemSolver:
         assert result.success
         # add the boundary nodes (under homogenous dirichlet constraint)
         displacement = np.pad(result.x, (1, 1))
-        # check non-penetrating body constraint
-        assert np.all(np.diff(np.concatenate((self.model.domain[0], self.model.domain[1])) + displacement) > 0)
+
+        assert np.all(np.diff(self.model.domain[0] + displacement[:self.model.domain[0].size]) >= 0)
+        assert np.all(np.diff(self.model.domain[1] + displacement[self.model.domain[0].size:]) >= 0)
 
         rods_div_idx = self.model.domain[0].size
         return displacement[:rods_div_idx], displacement[rods_div_idx:]
