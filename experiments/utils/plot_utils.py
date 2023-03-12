@@ -1,4 +1,4 @@
-from typing import Tuple, List
+from typing import Tuple, Sequence
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -10,7 +10,7 @@ from spring_rods_system_setup import SpringRodsSystemSetup
 
 def plot_displacements_and_stress(
         model: SpringRodsSystemSetup,
-        results: List[Tuple[np.ndarray, np.ndarray]],
+        results: Sequence[Tuple[np.ndarray, np.ndarray]],
         parameters_space: list,
         parameter_name: str,
         limits: Tuple[float, float],
