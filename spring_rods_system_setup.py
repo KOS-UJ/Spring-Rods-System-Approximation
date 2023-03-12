@@ -21,8 +21,8 @@ class SpringRodsSystemSetup:
         half_spring_len = spring_len / 2
 
         left_end, right_end = interval
-        left_rod = np.arange(left_end, -half_spring_len + step_size / 2, step_size)
-        right_rod = np.arange(half_spring_len, right_end + step_size / 2, step_size)
+        left_rod = np.linspace(left_end, -half_spring_len, int(np.ceil((-half_spring_len - left_end) / step_size)))
+        right_rod = np.linspace(half_spring_len, right_end, int(np.ceil((right_end - half_spring_len) / step_size)))
         self.domain = (left_rod, right_rod)
 
         assert np.isclose(left_rod[0], left_end)
