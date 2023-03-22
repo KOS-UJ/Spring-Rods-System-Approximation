@@ -27,6 +27,7 @@ class SpringRodsSystemSolver:
         result = optimize.minimize(
             fun=self.model,
             x0=np.zeros(self.free_nodes_num),
+            method='SLSQP',
             constraints=self.penetration_constraint,
             tol=1e-13,
             options={'maxiter': 10000}
