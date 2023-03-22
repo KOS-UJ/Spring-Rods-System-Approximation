@@ -46,15 +46,15 @@ def plot_displacements_and_stress(
     plt.axvline(x=model.spring_len / 2, color='gray', linestyle=':')
 
     if color_stresses:
-        plt.figtext(0.15, 0.03, 'a', horizontalalignment='center', verticalalignment='top')
-        plt.figtext(0.285, 0.03, '-l', horizontalalignment='center', verticalalignment='top')
-        plt.figtext(0.58, 0.03, 'l', horizontalalignment='center', verticalalignment='top')
-        plt.figtext(0.72, 0.03, 'b', horizontalalignment='center', verticalalignment='top')
+        plt.figtext(0.15, 0.085, 'a', horizontalalignment='center', verticalalignment='top')
+        plt.figtext(0.285, 0.085, '-l', horizontalalignment='center', verticalalignment='top')
+        plt.figtext(0.58, 0.085, 'l', horizontalalignment='center', verticalalignment='top')
+        plt.figtext(0.72, 0.085, 'b', horizontalalignment='center', verticalalignment='top')
     else:
-        plt.figtext(0.16, 0.03, 'a', horizontalalignment='center', verticalalignment='top')
-        plt.figtext(0.34, 0.03, '-l', horizontalalignment='center', verticalalignment='top')
-        plt.figtext(0.69, 0.03, 'l', horizontalalignment='center', verticalalignment='top')
-        plt.figtext(0.87, 0.03, 'b', horizontalalignment='center', verticalalignment='top')
+        plt.figtext(0.18, 0.085, 'a', horizontalalignment='center', verticalalignment='top')
+        plt.figtext(0.36, 0.085, '-l', horizontalalignment='center', verticalalignment='top')
+        plt.figtext(0.75, 0.085, 'l', horizontalalignment='center', verticalalignment='top')
+        plt.figtext(0.93, 0.085, 'b', horizontalalignment='center', verticalalignment='top')
 
     plt.ylabel(parameter_name)
     plt.xlabel('Position')
