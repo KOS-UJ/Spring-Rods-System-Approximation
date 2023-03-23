@@ -3,10 +3,10 @@ import numpy as np
 
 
 def l2_norm(values: Tuple[np.ndarray, np.ndarray], domain: Tuple[np.ndarray, np.ndarray]) -> float:
-    base = np.sum((
+    base = np.sum(np.fromiter((
         np.sum((val[:-1]**2 + val[1:]**2 + val[:-1]*val[1:]) * np.diff(dom))
         for val, dom in zip(values, domain)
-    ))
+    ), dtype=float))
     return np.sqrt(base / 3)
 
 
