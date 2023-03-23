@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, Optional
 
 import numpy as np
 from scipy import optimize
@@ -12,7 +12,7 @@ class SpringRodsSystemSolver:
     Encapsulates the computation of equilibrium state of the system.
     """
     
-    def __init__(self, model: SpringRodsSystemSetup, spring_len_bounds: tuple = None):
+    def __init__(self, model: SpringRodsSystemSetup, spring_len_bounds: Optional[tuple] = None):
         self.model = model
         self.free_nodes_num = self.model.domain[0].size + self.model.domain[1].size - 2
         self.right_rod_beg = self.model.domain[0].size - 1
