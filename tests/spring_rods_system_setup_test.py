@@ -7,7 +7,7 @@ from spring_rods_system_setup import SpringRodsSystemSetup
 
 class TestSpringRodsSystemSetup:
 
-    def setup(self):
+    def setup_method(self):
         self.system = SpringRodsSystemSetup(
             interval=(-10, 10),
             spring_len=3,
